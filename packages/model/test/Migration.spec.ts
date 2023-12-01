@@ -38,19 +38,30 @@ describe("Model", function(){
             Model.getInstance().migrate();
             
             const schemaAdapter = Model.getConnection().getSchema() as TestSchemaAdapter;
-            assert.notEqual(schemaAdapter.created.length, 0, 
+            assert.notEqual(schemaAdapter.created.length, 0,
                 "There should be changes.");
             
-            const databaseVersionChange = schemaAdapter.created[1];
+            //DatabaseVersion creation (for storing the database version)
+            const databaseVersionChange = schemaAdapter.created[0];
             assert.equal(databaseVersionChange.getName(), DatabseVersion.name, 
                 "DatabaseVerison should be created first.");
-            
+    
+            //TestGroup creation
             const testGroupChange = schemaAdapter.created[1];
-            assert.equal(testGroupChange.getName(), TestGroup.name, 
+
+            assert.notEqual(testGroupChange, undefined,
+                "The TestGroup cration change must exist.");
+
+            assert.equal(testGroupChange.getName(), TestGroup.name,
                 "TestGroup should be created second.");
 
+            //TestUser creation
             const testUserChange = schemaAdapter.created[2];
-            assert.equal(testUserChange.getName(), TestUser.name, 
+
+            assert.notEqual(testUserChange, undefined,
+                "The TestUser creation change must exist.");
+
+            assert.equal(testUserChange.getName(), TestUser.name,
                 "TestUser should be created third.");
 
         });
