@@ -15,7 +15,7 @@ export abstract class TransactionAdapter<NativeConnection>{
     }
 
     public createQuery<E extends Entity>(entityType: new() => E): Query<E>{
-        throw "Not implemented";
+        throw Error("Not implemented");
     }
 
     public beginTransaction(): void{

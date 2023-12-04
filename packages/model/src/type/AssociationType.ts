@@ -5,6 +5,10 @@ export type AssociationTypeConfig = {
 
 };
 
+export type HasOneAssociationConfig = {
+    foreignId?: string
+}
+
 export class AssociationType<C extends AssociationTypeConfig> extends Type<Entity, C>{
 
     protected target: () => typeof Entity;
@@ -54,15 +58,15 @@ export class OneAssociationType<C extends AssociationTypeConfig> extends Associa
 
 export class ManyAssociationType<C extends AssociationTypeConfig> extends AssociationType<C>{}
 
-export class WithOneAssociationType extends OneAssociationType<AssociationTypeConfig>{}
+export class BelongsToOneAssociationType extends OneAssociationType<AssociationTypeConfig>{}
 
-export class WithManyAssociationType extends OneAssociationType<AssociationTypeConfig>{}
+export class BelongsToManyAssociationType extends OneAssociationType<AssociationTypeConfig>{}
 
-export class HasOneAssociationType extends OneAssociationType<AssociationTypeConfig>{}
+export class HasOneAssociationType extends OneAssociationType<HasOneAssociationConfig>{}
 
 export class HasManyAssociationType extends OneAssociationType<AssociationTypeConfig>{}
 
-export function hasOne(targetType: () => typeof Entity, config: AssociationTypeConfig = {}): EntityFieldDecorator {
+export function hasOne(targetType: () => typeof Entity, config: HasOneAssociationConfig = {}): EntityFieldDecorator {
     return (value: Entity, context: ClassFieldDecoratorContext) => {
         TypeUtility.setType(null, context.name, new HasOneAssociationType(targetType, Entity, context.name, config));
     }
@@ -74,14 +78,14 @@ export function hasMany(targetType: () => typeof Entity, config: AssociationType
     }
 }
 
-export function withOne(targetType: () => typeof Entity, config: AssociationTypeConfig = {}): EntityFieldDecorator {
+export function belongsToOne(targetType: () => typeof Entity, config: AssociationTypeConfig = {}): EntityFieldDecorator {
     return (value: Entity, context: ClassFieldDecoratorContext) => {
-        TypeUtility.setType(null, context.name, () => new WithOneAssociationType(targetType, Entity, context.name, config));
+        TypeUtility.setType(null, context.name, () => new BelongsToOneAssociationType(targetType, Entity, context.name, config));
     }
 }
 
-export function withMany(targetType: () => typeof Entity, config: AssociationTypeConfig = {}): EntityFieldDecorator {
+export function belongsToMany(targetType: () => typeof Entity, config: AssociationTypeConfig = {}): EntityFieldDecorator {
     return (value: Entity, context: ClassFieldDecoratorContext) => {
-        TypeUtility.setType(null, context.name, () => new WithManyAssociationType(targetType, Entity, context.name, config));
+        TypeUtility.setType(null, context.name, () => new BelongsToManyAssociationType(targetType, Entity, context.name, config));
     }
 }

@@ -11,7 +11,7 @@ export class Query<E extends Entity, D extends Driver<any> = Driver<any>> implem
     }
 
     [Symbol.iterator](): Iterator<E, any, undefined>{
-        throw "Not implemented";
+        throw Error("Not implemented");
     }
 
     where(condition: (item: E) => boolean): this{

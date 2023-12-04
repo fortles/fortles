@@ -1,5 +1,6 @@
-import { readdir, copyFile } from "fs/promises";
-import { Connection, Model, ModelDescriptor, Migration, EntityDescriptor, CreateSchemaChange} from "../index.js";
+import { readdir } from "fs/promises";
+import { existsSync } from "fs";
+import { Connection, Model, ModelDescriptor, Migration, EntityDescriptor, CreateSchemaChange, SchemaChange} from "../index.js";
 import DatabseVersion from "./model/DatabaseVersion.js";
 
 /**
@@ -100,29 +101,51 @@ export class MigrationRunner{
 
     /**
      * Migrate connection to match the snapshot version.
+     * @param snapshot The snapshot
+     */
+    public async migrateConnectionFromSnapshot(snapshot: ModelDescriptor): Promise<void>{
+
+        const changesMap = this.model.getModelDescriptor().getChanges(snapshot);
+
+        // Create an array to hold promises for each connection's processing
+        const connectionPromises = [];
+
+        // Iterate over each connection and create a promise for its processing
+        for (const [connectionName, changes] of changesMap.entries()) {
+            const connectionPromise = this.processConnectionChanges(connectionName, changes);
+            connectionPromises.push(connectionPromise);
+        }
+
+        // Wait for all connections to finish processing
+        await Promise.all(connectionPromises);
+    }
+
+    /**
+     * Process all changes for a specific connection in sequence
+     */
+    private async processConnectionChanges(connectionName: string, changes: SchemaChange[]): Promise<void> {
+        const connection = Model.getConnection(connectionName);
+        for (const change of changes) {
+            await change.applyTo(connection);
+        }
+    }
+
+    /**
+     * Migrate connection to match the snapshot version.
      * @param name Name of the snapshot
      */
-    public async migrateConnectionFromSnapshot(name: string = "latest.snapshot"){
-        //Check if we applied the migrations first
-
-
+    public async migrateConnectionFromSnapshotFile(name: string = "latest.snapshot"): Promise<void>{
         //Detect changes from the last snapshot
         const path = this.basePath + "/" + name;
 
         let snapshot = await this.loadSnapshot(path);
+
+        //If the snapshot does not exists we assume an empty database here.
         if(!snapshot){
             snapshot = new ModelDescriptor();
         }
 
-        const changesMap = this.model.getModelDescriptor().getChanges(snapshot);
-
-        //Apply changes
-        for(const [connectionName, changes] of changesMap.entries()){
-            const connection = Model.getConnection(connectionName);
-            for(const change of changes){
-                change.applyTo(connection);
-            }
-        }
+        return this.migrateConnectionFromSnapshot(snapshot);
     }
 
     /**
@@ -136,10 +159,15 @@ export class MigrationRunner{
 
     /**
      * Loads a snapshot from a file
-     * @param path 
+     * @param path Path to the snapshot
+     * @returns The snapshot, or null if not exists
      */
-    public async loadSnapshot(path: string): Promise<ModelDescriptor>{
-        return ModelDescriptor.deserialize(path);
+    public async loadSnapshot(path: string): Promise<ModelDescriptor|null>{
+        if(existsSync(path)){
+            return ModelDescriptor.deserialize(path);
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -168,7 +196,7 @@ export class MigrationRunner{
      */
     public async saveMigrationFromSnapshot(name: string): Promise<void>{
         const baseSnapshot = await this.loadSnapshot(this.basePath + "/.baseline.snapshot");
-        if(!this.modelDescriptorSnapshot){
+        if(!this.modelDescriptorSnapshot || !baseSnapshot){
             return;
         }
         const changesMap = baseSnapshot.getChanges(this.modelDescriptorSnapshot);
@@ -185,7 +213,7 @@ export class MigrationRunner{
      * @param name Name of the snapshot.
      */
     public async updateSnapshotAndMigrateConnection(name: string = "latest.snapshot"){
-        await this.migrateConnectionFromSnapshot(name);
+        await this.migrateConnectionFromSnapshotFile(name);
         await this.saveSnapshot(name);
     } 
 }

@@ -1,6 +1,5 @@
-import { Model } from "@fortles/model";
+import { Model, ModelDescriptor } from "@fortles/model";
 import { MySqlDriver } from "../src/MySqlDriver.js";
-import MySqlConnection from "../src/MySqlConnection.js";
 
 describe("Database.MySql.Migration", function(){
 
@@ -13,9 +12,9 @@ describe("Database.MySql.Migration", function(){
     });
 
     it("Can create tables", async function(){
-        Model.getInstance().migrate();
-        const connection = Model.getConnection() as MySqlConnection;
-        const result = await connection.getNativeConnection().execute("SHOW TABLES");
-        console.log(result);
+        await Model.getInstance().getMigrationRunner().migrateConnectionFromSnapshot(new ModelDescriptor());
+        const connection = Model.getConnection();
+        const [rows, fields] = await connection.getNativeConnection().query("SHOW TABLES");
+        console.log(rows);
     });
 });

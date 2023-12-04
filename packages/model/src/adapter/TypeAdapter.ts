@@ -11,6 +11,13 @@ export abstract class TypeAdapter<T extends Type<I,any>, I, O, S>{
     }
 
     /**
+     * If set the export will be skipped.
+     * 
+     * If the data is dispalyed as it comes from the database it can skip the export / import step.
+     */
+    protected skipExport: boolean = false;
+
+    /**
      * Export a field from the Entity from its given type to the databases natvie type.
      * @param value Value in the entity.
      */

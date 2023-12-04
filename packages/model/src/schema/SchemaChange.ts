@@ -1,4 +1,4 @@
-import { Connection } from "../index.js";
+import { AssociationType, Connection } from "../index.js";
 
 export abstract class SchemaChange{
     protected name: string;

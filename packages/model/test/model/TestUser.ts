@@ -1,4 +1,4 @@
-import { Entity, primaryKey, generated, uuid, email, withMany, string, model } from "../../src/index.js";
+import { Entity, primaryKey, generated, uuid, email, belongsToMany, string, model } from "../../src/index.js";
 import { TestGroup } from "./index.js";
 
 /**
@@ -15,7 +15,7 @@ export class TestUser extends Entity{
     @email()
     email?: string;
 
-    @withMany(() => TestGroup)
+    @belongsToMany(() => TestGroup)
     groups?: TestGroup[];
 
     @string()

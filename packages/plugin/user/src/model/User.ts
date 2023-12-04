@@ -1,4 +1,4 @@
-import { Entity, uuid, generated, primaryKey, email, hasMany, withMany, model } from "@fortles/model";
+import { Entity, uuid, generated, primaryKey, email, hasMany, belongsToMany, model } from "@fortles/model";
 import Group from "./Group.js";
 
 @model
@@ -11,6 +11,6 @@ export default class User extends Entity{
     @email()
     email?: string;
 
-    @withMany(() => Group)
+    @belongsToMany(() => Group)
     groups?: Group[];
 }

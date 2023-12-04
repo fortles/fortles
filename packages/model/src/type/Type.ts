@@ -23,10 +23,23 @@ export abstract class Type<T,C> implements Exportable{
 
     protected validations: Validation<T>[] = [];
 
+    /**
+     * Name of the field
+     */
     protected name: string;
 
+    /**
+     * Configuration for the type
+     */
     protected config: C;
 
+    /**
+     * Creates a new type
+     * @param name Field name
+     * @param config Configuration
+     * @param propertyMap Properites in a name value Map
+     * @param validations Validations
+     */
     public constructor(
         name: string | symbol, 
         config: C, propertyMap: Map<string, Object> = new Map<string, Object>(), 
@@ -39,23 +52,45 @@ export abstract class Type<T,C> implements Exportable{
         ClassSerializer.register(this.constructor as any);
     }
 
+    /**
+     * Sets a property
+     * @param name Name of the property
+     * @param value Value of the property
+     */
     public setProperty(name: string, value: Object|null = null): void{
         this.propertyMap.set(name, value);
     }
 
+    /**
+     * Gets a property
+     * @param name Name of the property
+     * @returns The property or undefined
+     */
     public getProperty(name: string): Object{
         return this.propertyMap.get(name);
     }
 
+    /**
+     * Gets the configuration
+     * @returns the configuration object
+     */
     public getConfig(): C{
         return this.config;
     }
 
+    /**
+     * Check if this tipe has a property.
+     * @param name Name of the property.
+     * @returns true if has false othervise.
+     */
     public hasProperty(name: string): boolean{
         return this.propertyMap.has(name);
     }
 
-    public getName(){
+    /**
+     * Name of the field
+     */
+    public getName(): string{
         return this.name;
     }
 
@@ -143,19 +178,33 @@ export enum TypeProperty{
     NULLABLE = "nullable"
 }
 
+/**
+ * Makes a field read only
+ */
 export function readonly(value: any, context: ClassFieldDecoratorContext, descriptor: PropertyDescriptor) {
     descriptor.writable = false;
     return descriptor;
 }  
 
+/**
+ * Marks the field as primary key
+ */
 export function primaryKey(value: undefined, context: ClassFieldDecoratorContext){
     TypeUtility.setTypeProperty(null, context.name, TypeProperty.PRIMARY_KEY);
 }
 
+/**
+ * Marks the field as generated.
+ * 
+ * Generated fields are readonly, and can be set programatically.
+ */
 export function generated(value: undefined, context: ClassFieldDecoratorContext) {
     TypeUtility.setTypeProperty(null, context.name, TypeProperty.GENERATED);
 }
 
+/**
+ * Marks the type as nullable.
+ */
 export function nullable(value: undefined, context: ClassFieldDecoratorContext) {
     TypeUtility.setTypeProperty(null, context.name, TypeProperty.NULLABLE);
 }

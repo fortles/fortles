@@ -1,12 +1,15 @@
 import { IntegerType, TypeAdapter } from "@fortles/model";
 
 export class IntegerMySqlTypeAdapter extends TypeAdapter<IntegerType, number, number, string>{
+    
     override exportData(value: number): number {
         return value;
     }
+
     override importData(value: number): number {
         return value;
     }
+
     override exportSchema(): string {
         let config = this.type.getConfig();
         let definition = "";
