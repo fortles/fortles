@@ -1,6 +1,5 @@
 import assert from "assert";
 import { string, integer, primaryKey, generated, Entity, connection, IntegerType, StringType, model } from "../src/index.js"
-import { ExpressionTestConnection } from "./utility/ExpressionTestConnection.js";
 
 @model
 class TestEntity extends Entity{

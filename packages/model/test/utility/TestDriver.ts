@@ -1,7 +1,4 @@
-import { Test } from "mocha";
-import { AlterSchema } from "../../src/adapter/Schema.js";
-import { CreateSchemaChange, Driver, Entity, EntityAdapter, SchemaChange, SchemaAdapter, Connection, TransactionAdapter } from "../../src/index.js";
-import { DropSchemaChange } from "../../src/schema/DropSchema.js";
+import { CreateSchemaChange, Driver, Entity, EntityAdapter, SchemaChange, SchemaAdapter, Connection, TransactionAdapter, DropSchemaChange, AlterSchemaChange } from "../../src/index.js";
 
 /**
  * Stores the changes itself in the public created, dropped altered arrays.
@@ -9,7 +6,7 @@ import { DropSchemaChange } from "../../src/schema/DropSchema.js";
 export class TestSchemaAdapter extends SchemaAdapter<TestDriver>{
     public created: CreateSchemaChange[] = [];
     public dropped: DropSchemaChange[] = [];
-    public altered: AlterSchema[] = [];
+    public altered: AlterSchemaChange[] = [];
 
     override async create(schema: CreateSchemaChange): Promise<void> {
         this.created.push(schema);
@@ -17,7 +14,7 @@ export class TestSchemaAdapter extends SchemaAdapter<TestDriver>{
     override async drop(name: DropSchemaChange): Promise<void> {
         this.dropped.push(name);
     }
-    override async alter(schema: AlterSchema): Promise<void> {
+    override async alter(schema: AlterSchemaChange): Promise<void> {
         this.altered.push(schema);
     }
 

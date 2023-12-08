@@ -45,4 +45,14 @@ export class Connection<NativeConnection = any, D extends Driver<NativeConnectio
     public endTransaction(): void{
         this.transactionAdapter.endTransaction();
     }
+
+    /**
+     * Closes the connection.
+     * 
+     * After this not actions shoud be executed this connection.
+     * Some native connection are not released after execution finishes, this function will close them.
+     */
+    public  async close(): Promise<void>{
+        this.transactionAdapter.close();
+    }
 }

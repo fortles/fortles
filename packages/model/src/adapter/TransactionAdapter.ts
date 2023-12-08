@@ -25,4 +25,6 @@ export abstract class TransactionAdapter<NativeConnection>{
     public endTransaction(): void{
 
     }
+
+    public async close(): Promise<void> {}
 }

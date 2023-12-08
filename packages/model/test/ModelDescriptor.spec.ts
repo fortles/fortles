@@ -34,14 +34,29 @@ describe("ModelDescriptor", function(){
         const path = "./temp/serialized-model-descriptor.js";
         await ModelDescriptor.serialize(modelDescriptor, path);
         const deserialized = await ModelDescriptor.deserialize(path);
-        //BaseEntityType is needed for building up the model descriptor only.
-        //It makes no sense, or even exits when a snapshot is loaded, deserialized.
-        for(const entityDescriptor of modelDescriptor.getEntityDescriptors()){
-            entityDescriptor.baseEntityType = null;
+
+        // BaseEntityType is needed for building up the model descriptor only.
+        // It makes no sense, or even exits when a snapshot is loaded, deserialized.
+        let i = 0;
+        for(const i in modelDescriptor.getEntityDescriptors()){
+            const expectedEntityDescriptor = modelDescriptor.getEntityDescriptors()[i];
+            expectedEntityDescriptor.baseEntityType = null;
+            const currentEntityDescriptor = deserialized.getEntityDescriptors()[i];
+            // Check validations as functions not checked by deep equial
+            for(const [name, expectedType] of expectedEntityDescriptor.typeMap){
+                const currentType = currentEntityDescriptor.typeMap.get(name);
+                assert.equal(expectedType.getValidations().length, currentType?.getValidations().length);
+                for(const j in expectedType.getValidations()){
+                    const currentValidation = currentType?.getValidations()[j];
+                    const expectedValidation = expectedType.getValidations()[j];
+                    assert.equal(currentValidation?.toString(), expectedValidation.toString());
+                }
+                // @ts-ignore
+                currentType.validations = expectedType.validations = [];
+            }
         }
-        //@ts-ignore
-        //console.log(modelDescriptor.getEntityDescriptors()[0].typeMap, deserialized.getEntityDescriptors()[0].typeMap);
-        console.log(TestUser.toString());
-        assert.equal(modelDescriptor, deserialized);
+
+        // Check the rest
+        assert.deepEqual(modelDescriptor, deserialized);
     });
 });

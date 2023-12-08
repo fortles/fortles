@@ -6,9 +6,7 @@ export default function migrationTestSuite(){
     //let migrator: Migrator;
     describe("General migration", function(){
         before("Build complex model", async function(){
-            if(import.meta.resolve){
-                let path = await import.meta.resolve("../model");
-            }
+            let path = await import.meta.resolve("../model");
             throw new Error("Not implemented");
         });
         it("Check if the modell is correct", async function(){

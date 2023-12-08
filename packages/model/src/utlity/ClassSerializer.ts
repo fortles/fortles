@@ -56,6 +56,9 @@ export class ClassSerializer{
      * @returns The class intance.
      */
     public static import<T>(source: ExportedObject): T{
+        if(!source.type){
+            throw new Error("Missing type while importing. You may forgot to write the export part for the embedded class.");
+        }
         const classType = this.classMap.get(source.type);
         if(!classType){
             throw new Error(source.type + " can not be serialies. The class type is not registered to the serializer.");

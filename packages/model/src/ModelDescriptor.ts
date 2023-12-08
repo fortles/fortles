@@ -2,7 +2,7 @@ import { dirname, extname, resolve } from "path";
 import { pathToFileURL } from "url";
 import { createReadStream, createWriteStream, mkdirSync, readdirSync } from "fs";
 
-import { ClassSerializer } from "./utlity/ClassSerializer.js";
+import { ClassSerializer, Exportable, ExportedData, ExportedObject } from "./utlity/ClassSerializer.js";
 import { AlterSchemaChange, Connection, CreateSchemaChange, DropSchemaChange, Entity, EntityDescriptor, Model, ModelChange, SchemaChange } from "./index.js";
 import { readFile, writeFile } from "fs/promises";
 
@@ -11,7 +11,7 @@ import { readFile, writeFile } from "fs/promises";
  * It contains all the entities as well.
  */
 @ClassSerializer.serializable
-export class ModelDescriptor{
+export class ModelDescriptor implements Exportable{
     
     protected entityDescriptors: EntityDescriptor[];
     protected sources: string[];
@@ -170,5 +170,18 @@ export class ModelDescriptor{
 
     public getEntityDescriptors(): EntityDescriptor[]{
         return this.entityDescriptors;
+    }
+
+    public export(): ExportedData {
+        return {
+            entityDescriptors: this.entityDescriptors.map(x => ClassSerializer.export(x)),
+            sources: this.sources
+        };
+    }
+
+    public import(source: ExportedData): void {
+        this.entityDescriptors = source.entityDescriptors
+            .map((x: ExportedObject) => ClassSerializer.import(x));
+        this.sources = source.sources;
     }
 }

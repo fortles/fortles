@@ -4,7 +4,7 @@
     "moduleResolution": "nodenext",
     //"resolveJsonModule": true,
     "esModuleInterop": true,
-    "module": "ESNext",
+    "module": "nodenext",
     "sourceMap": true,
     "rootDir": "packages",
     "declaration": true,  

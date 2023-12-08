@@ -1,6 +1,4 @@
-import {Query, Driver, EntityAdapter, Entity, SchemaChange, CreateSchemaChange } from "../index.js";
-import { DropSchemaChange } from "../schema/DropSchema.js";
-import { AlterSchema } from "./Schema.js";
+import { CreateSchemaChange, DropSchemaChange, AlterSchemaChange } from "../index.js";
 
 /**
  * Connects the whole model (all entities) to a given database.
@@ -37,7 +35,7 @@ export abstract class SchemaAdapter<NativeConnection>{
      * Changes a table by the schema definition.
      * @param schema Schame holding the change data.
      */
-    public abstract alter(schema: AlterSchema): Promise<void>;
+    public abstract alter(schema: AlterSchemaChange): Promise<void>;
 
     /**
      * Creates the database that was specified in the connection.
