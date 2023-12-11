@@ -1,5 +1,6 @@
 {
     "name": "@fortles/cli",
+    "description": "This packages adds automatically all fortles packages to the cli.",
     "type": "module",
     "version": "0.1.0",
     "bin": {

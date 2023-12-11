@@ -24,7 +24,10 @@ export class MigrationRunner{
     protected model: Model;
 
     /** The current snapshot, changes can be calculated since this one. */
-    protected modelDescriptorSnapshot: ModelDescriptor|null = null;
+    protected currentSnapshot: ModelDescriptor|null = null;
+
+    /** The snapshot which should represent the the inital state of the database. */
+    protected baselineSnapshot: ModelDescriptor|null = null;
 
     /** Where the migrations are stored. Each connection will have a subfolder here. */
     protected basePath: string = "./migartion";
@@ -76,7 +79,7 @@ export class MigrationRunner{
         }catch(error){
             //TODO check error
             //If there is no database version for this connection, add to the database.
-            const entityDescriptor = EntityDescriptor.create(DatabseVersion, this.model.getModelDescriptor());
+            const entityDescriptor = EntityDescriptor.create(DatabseVersion);
             const createSchemaChange = CreateSchemaChange.createFromEntityDescriptor(entityDescriptor);
             createSchemaChange.applyTo(connection);
         }
@@ -153,8 +156,8 @@ export class MigrationRunner{
      * @param path Save the snapshot to this location.
      */
     public async saveSnapshot(path: string): Promise<void>{
-        this.modelDescriptorSnapshot = this.model.getModelDescriptor().clone();
-        ModelDescriptor.serialize(this.modelDescriptorSnapshot, path);
+        this.currentSnapshot = this.model.getModelDescriptor().clone();
+        ModelDescriptor.serialize(this.currentSnapshot, path);
     }
 
     /**
@@ -174,38 +177,60 @@ export class MigrationRunner{
      * Creates a baseline snapshot.
      * 
      * This is the database version after the latest migration, with other words the latest version
-     * before any additional changes are added to the database. If the database not updated to the latest
-     * version or `applyMigrations` are not set, this will fail.
+     * before any additional changes are added to the database. If the database has not all migrations
+     * applied or `applyMigrations` are not set, this will fail.
      * 
      * @param applyMigrations If migrations should be applied anyways, dirty check can be skipped.
      * @throws When not all the migrations are applied, and applyMigrations are not set.
      */
-    public async createBaseSnapshot(applyMigrations: boolean = false): Promise<void>{
+    public async createBaselineSnapshot(applyMigrations: boolean = false): Promise<void>{
         if(applyMigrations){
             await this.migrate();
         }if(await this.isDirty()){
             throw new Error("You have migrations that are not applied!");
         }
-        ModelDescriptor.serialize(this.model.getModelDescriptor(), this.basePath + "/baseline.snapshot");
+        this.baselineSnapshot = this.model.getModelDescriptor().clone();
+        ModelDescriptor.serialize(this.baselineSnapshot, this.basePath + "/baseline.snapshot");
+    }
+
+    /**
+     * Loads the baseline snapshot.
+     * 
+     * If the snapshot is already loaded just returns it.
+     * @returns The Baseline snapshot.
+     */
+    public async loadBaselineSnapshot(): Promise<ModelDescriptor|null>{
+        if(!this.baselineSnapshot){
+            this.baselineSnapshot = await this.loadSnapshot(this.basePath + "/.baseline.snapshot");
+        }
+        return this.baselineSnapshot;
     }
 
     /**
      * Creates a migration from the changes since the baseline snapshot.
+     * 
+     * A baseline snapshot must exist. It will save async for different connections.
      * @param name Name of the migration.
-     * @returns An empty promise
+     * @returns An empty promise.
      */
-    public async saveMigrationFromSnapshot(name: string): Promise<void>{
-        const baseSnapshot = await this.loadSnapshot(this.basePath + "/.baseline.snapshot");
-        if(!this.modelDescriptorSnapshot || !baseSnapshot){
-            return;
+    public async saveMigrationFromCurrentSnapshot(name: string): Promise<void>{
+        const baselineSnapshot = await this.loadSnapshot(this.basePath + "/.baseline.snapshot");
+        const results = [];
+        if(!baselineSnapshot){
+            throw Error("The baseline snapshot does not exists there is ntohing to migrate from.");
         }
-        const changesMap = baseSnapshot.getChanges(this.modelDescriptorSnapshot);
+        if(!this.currentSnapshot){
+            throw Error("The current snapshot does not exists there is nothing to migrate to.");
+        }
+        const changesMap = baselineSnapshot.getChanges(this.currentSnapshot);
         for(const [connectionName, changes] of changesMap){
             const migartion = new Migration(changes);
             const version = this.databaseVersionMap.get(connectionName)?.version ?? 1;
-            migartion.save(this.basePath + "/" + connectionName + "/" + version + "_" + name, name);
+            results.push(migartion.save(this.basePath + "/" + connectionName + "/" + version + "_" + name, name));
             //TODO: Save version to the database.
         }
+        // Wait for all saving task to finish.
+        await Promise.all(results);
     }
 
     /**

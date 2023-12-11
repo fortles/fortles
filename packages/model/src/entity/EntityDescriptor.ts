@@ -77,8 +77,8 @@ export class EntityDescriptor implements Exportable{
     public setType(name: string, type: Type<any, any>){
         if(type instanceof AssociationType){
             const associationTypeDescriptor = new AssociationTypeDescriptor(type.getName(), type.getConfig(), type.getPropertyMap(), type.getValidations());
-            associationTypeDescriptor.source = type.getSource().name;
-            associationTypeDescriptor.target = type.getTarget().name;
+            associationTypeDescriptor.source = type.getSource();
+            associationTypeDescriptor.setTarget(type.getTarget());
             this.typeMap.set(name, associationTypeDescriptor);
         }else{
             this.typeMap.set(name, type);

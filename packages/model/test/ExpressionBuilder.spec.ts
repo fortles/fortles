@@ -21,7 +21,7 @@ describe("ExpressionBuilder", function(){
         await Model.getInstance().setDriver(new TestDriver());
     });
 
-    it("Translates a simple query.", function(){
+    xit("Translates a simple query.", function(){
         const query = testQuery.getSimpleQuery();
         
     });

@@ -55,7 +55,7 @@ export class ModelDescriptor implements Exportable{
                     break;
                 }
             }
-            this.entityDescriptors.push(EntityDescriptor.create(entityType, this, source));
+            this.entityDescriptors.push(EntityDescriptor.create(entityType, source));
         }
     }
 

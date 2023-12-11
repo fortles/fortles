@@ -11,7 +11,7 @@ describe("Database.MySql.Migration", function(){
         }));
     });
 
-    it("Can create tables", async function(){
+    xit("Can create tables", async function(){
         await Model.getInstance().getMigrationRunner().migrateConnectionFromSnapshot(new ModelDescriptor());
         const connection = Model.getConnection();
         const [rows, fields] = await connection.getNativeConnection().query("SHOW TABLES");

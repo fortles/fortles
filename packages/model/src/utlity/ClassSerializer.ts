@@ -77,7 +77,10 @@ export class ClassSerializer{
      * @param instance Class to serialize.
      * @returns Custom object representation of the class.
      */
-    public static export(instance: Exportable | object): ExportedObject {
+    public static export(instance: Exportable | object | undefined): ExportedObject | undefined {
+        if(typeof instance == "undefined"){
+            return undefined;
+        }
         let data = {};
         if((instance as Exportable).export){
             data = (instance as any).export();
