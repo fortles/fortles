@@ -12,7 +12,7 @@ class TestEntity extends Entity{
     public name?: string;
 }
 
-describe("Entity", function(){
+describe("Model.Entity", function(){
 
     it("Has coorect primary keys", function(){
         const modelInfo = TestEntity.getModelInfo();

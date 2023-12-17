@@ -1,4 +1,5 @@
-import { CreateSchemaChange, Driver, Entity, EntityAdapter, SchemaChange, SchemaAdapter, Connection, TransactionAdapter, DropSchemaChange, AlterSchemaChange } from "../../src/index.js";
+import { CreateSchemaChange, Driver, Entity, EntityAdapter, SchemaChange, SchemaAdapter, Connection, TransactionAdapter, DropSchemaChange, AlterSchemaChange, Query } from "../../src/index.js";
+import ExpressionQuery from "../../src/query/ExpressionQuery.js";
 
 /**
  * Stores the changes itself in the public created, dropped altered arrays.
@@ -21,7 +22,9 @@ export class TestSchemaAdapter extends SchemaAdapter<TestDriver>{
 }
 
 export class TestTransactionAdapter extends TransactionAdapter<TestDriver>{
-
+    public override createQuery<E extends Entity>(entityType: new () => E): ExpressionQuery<E, TestDriver> {
+        return new ExpressionQuery(entityType, this);
+    }
 }
 
 export class TestEntityAdapter extends EntityAdapter{

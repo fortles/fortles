@@ -16,7 +16,7 @@ class TestUserWronglyExtended extends TestUser{
     override name: string = "Overriding is not possible"
 }
 
-describe("EntityDescriptor", function(){
+describe("Model.EntityDescriptor", function(){
     it("Can be extended in any order", function(){
         const testUser = new TestUser();
         const entityDescriptor = EntityDescriptor.create(TestUser, "base.js");

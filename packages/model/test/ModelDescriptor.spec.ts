@@ -4,7 +4,7 @@ import { CreateSchemaChange, Model, ModelChangeType, ModelDescriptor } from "../
 import { TestGroup, TestUser } from "./model/index.js";
 import { TestModelDescriptor } from "./utility/TestModelDescriptor.js";
 
-describe("ModelDescriptor", function(){
+describe("Model.ModelDescriptor", function(){
     let modelDescriptor: ModelDescriptor;
 
     this.beforeEach("Preapre Model", async function(){
@@ -45,7 +45,7 @@ describe("ModelDescriptor", function(){
             // Check validations as functions not checked by deep equial
             for(const [name, expectedType] of expectedEntityDescriptor.typeMap){
                 const currentType = currentEntityDescriptor.typeMap.get(name);
-                assert.equal(expectedType.getValidations().length, currentType?.getValidations().length);
+                assert.equal(expectedType.getValidations()?.length, currentType?.getValidations()?.length);
                 for(const j in expectedType.getValidations()){
                     const currentValidation = currentType?.getValidations()[j];
                     const expectedValidation = expectedType.getValidations()[j];

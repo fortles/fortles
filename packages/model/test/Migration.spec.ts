@@ -5,13 +5,13 @@ import { TestGroup } from "./model/TestGroup.js";
 import { TestDriver, TestSchemaAdapter } from "./utility/TestDriver.js";
 import { AssociationTypeDescriptor } from "../src/type/AssociationTypeDescriptor.js";
 
-describe("Model", function(){
+describe("Model.Migartion", function(){
 
     this.beforeAll("Preapre connection", function(){
         Model.getInstance().setDriver(new TestDriver("default"));
     });
 
-    describe("Migration", function(){
+    describe("Change Detection", function(){
         this.beforeAll("Preapre Model", async function(){
             await Model.getInstance().getModelDescriptor().addFolder("./packages/model/test/model");
         });

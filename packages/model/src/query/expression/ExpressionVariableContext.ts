@@ -1,0 +1,1 @@
+export type ExpressionVaribleContext = Record<string, any>;

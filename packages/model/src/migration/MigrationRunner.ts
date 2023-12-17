@@ -75,7 +75,7 @@ export class MigrationRunner{
         let databaseVersion = new DatabseVersion();
         let migrationsApplied = 0;
         try{
-            databaseVersion = connection.query(DatabseVersion).first() ?? new DatabseVersion();
+            databaseVersion = await connection.query(DatabseVersion).first() ?? new DatabseVersion();
         }catch(error){
             //TODO check error
             //If there is no database version for this connection, add to the database.

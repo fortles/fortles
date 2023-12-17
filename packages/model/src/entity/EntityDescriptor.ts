@@ -77,8 +77,9 @@ export class EntityDescriptor implements Exportable{
     public setType(name: string, type: Type<any, any>){
         if(type instanceof AssociationType){
             const associationTypeDescriptor = new AssociationTypeDescriptor(type.getName(), type.getConfig(), type.getPropertyMap(), type.getValidations());
-            associationTypeDescriptor.source = type.getSource();
-            associationTypeDescriptor.setTarget(type.getTarget());
+            //TODO Think this trough
+            //associationTypeDescriptor.source = EntityDescriptor.create(type.getSource());
+            //associationTypeDescriptor.target = EntityDescriptor.create(type.getTarget());
             this.typeMap.set(name, associationTypeDescriptor);
         }else{
             this.typeMap.set(name, type);
@@ -98,7 +99,7 @@ export class EntityDescriptor implements Exportable{
         return this.baseName;
     }
 
-    public static create(entityType: typeof Entity, modelDescriptor: ModelDescriptor, source: string|null = null){
+    public static create(entityType: typeof Entity, source: string|null = null){
         const typeMap = entityType.getTypeMap();
         const sourceMap = new Map(Array.from(typeMap, ([name, x]) => [name, source]));
         return new this(entityType.name, entityType.getTypeMap(), sourceMap, entityType);
